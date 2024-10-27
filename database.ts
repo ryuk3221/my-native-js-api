@@ -1,11 +1,14 @@
-import sqlite3 from "sqlite3";
+import { Database, verbose } from "sqlite3";
 
-sqlite3.verbose();
+if (process.env.DEBUG) {
+  verbose();
+}
 
-export const db = new sqlite3.Database('memory', (err) => {
+export const db = new Database('memory', (err) => {
   if (err) {
     console.error(err.message);
   }
+
   console.log('Connected to sqli3 db');
 });
 

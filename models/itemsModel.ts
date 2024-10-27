@@ -1,19 +1,30 @@
-import { db } from "../database.js";
+import { Database } from "sqlite3";
+import { db } from "../database";
+import { ItemsModelProps, ItemProps, ItemUpdateProps } from './types';
 
-export const itemsModel = {
-  getAllItems: function() {
+export default class ItemsModel implements ItemsModelProps {
+  database: Database;
+  changes: ItemProps;
+
+  constructor({ database }) {
+    this.database = database
+  }
+
+  get all() {
     return new Promise((resolve, reject) => {
       db.all('SELECT * FROM items', [], (err, rows) => {
         if (err) {
           reject(err);
-        } else {
-          resolve(rows);
+
+          return;
         }
+
+        resolve(rows);
       })
     });
-  },
+  }
 
-  getItemById: function(id) {
+  getItem(id: number) {
     return new Promise((resolve, reject) => {
       db.get('SELECT * FROM items WHERE id=?', [id], (err, row) => {
         if (err) {
@@ -23,11 +34,11 @@ export const itemsModel = {
         }
       });
     });
-  },
+  }
 
-  createItem: function(item) {
-    return new Promise((resolve, reject) => {
-      db.run('INSERT INTO items(name, description) VALUES(?, ?)', [item.name, item.description], (err) => {
+  create({ name, description }: ItemProps) {
+    new Promise((resolve, reject) => {
+      db.run('INSERT INTO items(name, description) VALUES(?, ?)', [name, description], (err) => {
         if (err) {
           reject(err);
         } else {
@@ -35,11 +46,11 @@ export const itemsModel = {
         }
       });
     });
-  },
+  }
 
-  updateItem: function(id, item) {
+  update({ id, description, name }: ItemUpdateProps) {
     return new Promise((resolve, reject) => {
-      db.run('UPDATE items SET name=?, description=? WHERE id=?', [item.name, item.description, id], err => {
+      db.run('UPDATE items SET name=?, description=? WHERE id=?', [name, description, id], err => {
         if (err) {
           reject(err);
         } else {
@@ -47,9 +58,9 @@ export const itemsModel = {
         }
       });
     });
-  },
+  }
 
-  deleteItem: function(id) {
+  delete(id: number) {
     return new Promise((resolve, reject) => {
       db.run('DELETE FROM items WHERE id=?', [id], err => {
         if (err) {

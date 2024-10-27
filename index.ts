@@ -1,14 +1,11 @@
 import http from "http";
 import { createItem, deleteItem, getItemById, getItems, updateItem } from "./controllers/itemsController.js";
 
-
-const port = 3000;
-
 const server = http.createServer(async (req, res) => {
   //url запроса
-  const url = new URL(req.url, `http://${req.headers.host}`);
-
+  const url = new URL(req.url!, process.env.ALLOWED_HOST);
   const { pathname } = url;
+
   if (req.method === "GET" && pathname === '/items') {
     await getItems(req, res);
   }
@@ -28,11 +25,11 @@ const server = http.createServer(async (req, res) => {
     await updateItem(req, res, id);
   }
   else {
-    res.statusCode = '404';
+    res.statusCode = 404;
     res.end('Not Found');
   }
 });
 
-server.listen(port, () => {
-  console.log(`Server running at port: ${port}`);
+server.listen(process.env.PORT, () => {
+  console.log(`Server running at port: ${process.env.PORT}`);
 })
